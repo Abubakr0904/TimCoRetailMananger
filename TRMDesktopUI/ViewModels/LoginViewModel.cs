@@ -4,14 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using TRMDesktopUI.Helpers;
 
 namespace TRMDesktopUI.ViewModels
 {
     public class LoginViewModel : Screen
     {
         private string _userName;
-
         private string _password;
+        private IApiHelper _apiHelper;
+
+        public LoginViewModel(IApiHelper apiHelper)
+        {
+            _apiHelper = apiHelper;
+        }
 
         public string UserName
         {
@@ -37,13 +44,26 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
+        public void OnPasswordChanged(PasswordBox source)
+        {
+            Password = source.Password;
+        }
+
         private void NotifyCanLogIn() => NotifyOfPropertyChange(() => CanLogIn);
 
         public bool CanLogIn { get { return UserName?.Length > 0 && Password?.Length > 0; } }
 
-        public void LogIn(string username, string password)
+        public async Task LogIn()
         {
-            Console.WriteLine();
+            try
+            {
+                var result = await _apiHelper.Authenticate(UserName, Password);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
         }
     }
 }
