@@ -10,7 +10,7 @@ namespace TRMDataManager.Library.DataAccess
 {
     public class UserData
     {
-        public IList<UserModel> GetUserById(string id)
+        public UserModel GetUserById(string id)
         {
             SqlDataAccess sql = new SqlDataAccess();
 
@@ -18,7 +18,7 @@ namespace TRMDataManager.Library.DataAccess
 
             var result = sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "TRMData");
 
-            return result;
+            return result.First();
         }
     }
 }

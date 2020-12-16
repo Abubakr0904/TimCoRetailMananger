@@ -13,7 +13,7 @@ namespace TRMDataManager.Controllers
     [RoutePrefix("api/User")]
     public class UserController : ApiController
     {
-        public IList<UserModel> Details()
+        public UserModel Details()
         {
             var userId = RequestContext.Principal.Identity.GetUserId();
 
