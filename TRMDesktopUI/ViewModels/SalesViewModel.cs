@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TRMDesktopUI.ViewModels
 {
-    class SalesViewModel : Screen
+    public class SalesViewModel : Screen
     {
         private BindingList<string> _products;
         private BindingList<string> _cart;
@@ -26,10 +26,10 @@ namespace TRMDesktopUI.ViewModels
 
         public BindingList<string> Cart
         {
-            get { return _products; }
+            get { return _cart; }
             set
             {
-                _products = value;
+                _cart = value;
                 NotifyOfPropertyChange(() => Cart);
             }
         }
