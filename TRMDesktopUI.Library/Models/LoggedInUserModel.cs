@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TRMDesktopUI.Library.Models
 {
-    class LoggedInUserModel
+    public class LoggedInUserModel : ILoggedInUserModel
     {
         public string Id { get; set; }
         public string FirstName { get; set; }

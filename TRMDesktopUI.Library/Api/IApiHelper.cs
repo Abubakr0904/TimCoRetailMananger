@@ -6,5 +6,7 @@ namespace TRMDesktopUI.Library.Api
     public interface IApiHelper
     {
         Task<AuthenticatedUser> Authenticate(string username, string password);
+
+        Task GetLoggedInUserInfo(string token);
     }
 }
