@@ -19,6 +19,8 @@ namespace TRMDesktopUI.Library.Api
             _loggedInUserModel = loggedInUserModel;
         }
 
+        public HttpClient ApiClient { get { return _apiClient; } }
+
         private void InitializeClient()
         {
             var baseUrl = ConfigurationManager.AppSettings["api"];
