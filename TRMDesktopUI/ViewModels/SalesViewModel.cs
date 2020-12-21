@@ -3,16 +3,13 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Models;
+using System.Linq;
 
 namespace TRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
         private readonly IProductEndpoint _productEndpoint;
-
-        private BindingList<ProductModel> _products;
-        private BindingList<string> _cart;
-        private string _itemQuantity;
 
         public SalesViewModel(IProductEndpoint productEndpoint)
         {
@@ -31,6 +28,8 @@ namespace TRMDesktopUI.ViewModels
             Products = new BindingList<ProductModel>(productList);
         }
 
+        private BindingList<ProductModel> _products;
+
         public BindingList<ProductModel> Products
         {
             get { return _products; }
@@ -41,39 +40,79 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        public BindingList<string> Cart
+        public BindingList<CartItemModel> Cart => new BindingList<CartItemModel>(CartModelDto.Products);
+
+        private CartModel _cart = new CartModel();
+
+        public CartModel CartModelDto
         {
             get { return _cart; }
             set
             {
                 _cart = value;
+
+                NotifyOfPropertyChange(() => CartModelDto); 
                 NotifyOfPropertyChange(() => Cart);
             }
         }
 
-        public string ItemQuantity
+        private int _itemQuantity;
+
+        public int ItemQuantity
         {
             get { return _itemQuantity; }
             set
             {
                 _itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
-        public bool CanAddToCart
+        private ProductModel _selectedProduct;
+
+        public ProductModel SelectedProduct
         {
-            get { return false; }
+            get { return _selectedProduct; }
+            set 
+            { 
+                _selectedProduct = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
+            }
         }
+
+        private ProductModel _selectedRemoveProduct;
+
+        public ProductModel SelectedRemoveProduct
+        {
+            get { return _selectedRemoveProduct; }
+            set 
+            { 
+                _selectedRemoveProduct = value;
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
+            }
+        }
+
+
+        public bool CanAddToCart => ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity;
 
         public void AddToCart()
         {
+            var item = new CartItemModel 
+            { 
+                Product = SelectedProduct,
+                QuantityInCart = ItemQuantity
+            };
+            CartModelDto.AddProduct(item);
 
+            NotifyOfPropertyChange(() => Subtotal);
+            NotifyOfPropertyChange(() => Cart);
         }
 
         public bool CanCheckout
         {
-            get { return false;  }
+            get { return false; }
         }
 
         public void Checkout()
@@ -81,28 +120,14 @@ namespace TRMDesktopUI.ViewModels
 
         }
 
-        public bool CanRemoveFromCart
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool CanRemoveFromCart => SelectedRemoveProduct != null;
 
         public void RemoveFromCart()
         {
-
         }
 
-
-
-        public string SubTotal
-        {
-            get
-            {
-                return "$0.00";
-            }
-        }
+        public string Subtotal => CartModelDto.SubTotal.ToString("C");
+        
         public string Tax
         {
             get
