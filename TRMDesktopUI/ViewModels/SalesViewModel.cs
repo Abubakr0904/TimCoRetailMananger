@@ -4,16 +4,19 @@ using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Models;
 using System.Linq;
+using TRMDesktopUI.Library.Helpers;
 
 namespace TRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
         private readonly IProductEndpoint _productEndpoint;
+        private readonly IConfigHelper _configHelper;
 
-        public SalesViewModel(IProductEndpoint productEndpoint)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
         {
             _productEndpoint = productEndpoint;
+            _configHelper = configHelper;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -106,8 +109,10 @@ namespace TRMDesktopUI.ViewModels
             };
             CartModelDto.AddProduct(item);
 
-            NotifyOfPropertyChange(() => Subtotal);
             NotifyOfPropertyChange(() => Cart);
+            NotifyOfPropertyChange(() => Subtotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public bool CanCheckout
@@ -132,7 +137,9 @@ namespace TRMDesktopUI.ViewModels
         {
             get
             {
-                return "$0.00";
+                var taxRate = (decimal)_configHelper.GetTaxRate();
+                CartModelDto.TaxRate = taxRate;
+                return CartModelDto.TaxAmount.ToString("C");
             }
         }
 
@@ -140,7 +147,7 @@ namespace TRMDesktopUI.ViewModels
         {
             get
             {
-                return "$0.00";
+                return CartModelDto.Total.ToString("C");
             }
         }
     }
